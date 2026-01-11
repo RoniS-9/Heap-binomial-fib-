@@ -41,14 +41,14 @@ public class Heap {
     }
 
     public void consolidate() {
-        int maxRank = (int) Math.floor(Math.log(this.size) / Math.log(2)) + 1;
+        int maxRank = (int) Math.floor(Math.log(this.size) / Math.log(2)) + 3;
         HeapNode[] rankTable = new HeapNode[maxRank];
 
         // Collect trees of same rank
-        // ArrayList<HeapNode> roots = new ArrayList<>();
+        ArrayList<HeapNode> roots = new ArrayList<>();
         HeapNode current = this.min.node;
         HeapNode start = current;
-        /*do {
+        do {
             roots.add(current);
             current = current.next;
         }
@@ -65,9 +65,9 @@ public class Heap {
                 rank = linked.rank;
             }
             rankTable[rank] = linked;
-        }*/
+        }
 
-        do {
+        /*do {
             int rank = current.rank;
             HeapNode next = current.next;
             HeapNode linked = current;
@@ -80,7 +80,7 @@ public class Heap {
             rankTable[rank] = linked;
             current = next;
         }
-        while (current != start);
+        while (current != start);*/
 
         // Rebuild root list and find new min
         this.min = null;
@@ -146,6 +146,7 @@ public class Heap {
         parent.item = temp;
         startNode.item.node = startNode;
         parent.item.node = parent;
+        totalHeapifyCosts++;
     }
 
     public HeapNode link(HeapNode x, HeapNode y) {
@@ -403,12 +404,13 @@ public class Heap {
      */
     public void decreaseKey(HeapItem x, int diff) {
         x.key -= diff;
-        if (x.key < this.min.key) { this.min = x; }
+
         if (this.lazyDecreaseKeys) {
             lazyDecreaseKey(x);
         } else {
             nonLazyDecreaseKey(x);
         }
+        if (x.key < this.min.key) { this.min = x; }
     }
 
     /**
