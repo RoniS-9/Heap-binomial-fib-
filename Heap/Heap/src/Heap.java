@@ -110,9 +110,32 @@ public class Heap {
         }
     }
 
+
+    public void cascadeCut(HeapNode  x) {
+        HeapNode parent = x.parent;
+        if (parent == null) return; // x is a root
+
+        cut(x);
+        if (x.marked) {
+            x.marked = false;
+            numMarkedNodes = Math.max(0, numMarkedNodes - 1);
+        }
+
+        if (parent.marked) {
+            cascadeCut(parent);
+        }
+        else {
+            parent.marked = true;
+            numMarkedNodes++;
+        }
+    }
     public void lazyDecreaseKey(HeapItem x) {
         HeapNode parent = x.node.parent;
         if (parent != null && x.key < parent.item.key) {
+            cascadeCut(x.node);
+        }
+
+        /*if (parent != null && x.key < parent.item.key) {
             cut(x.node);
             if (parent.marked) {
                 cut(parent);
@@ -125,7 +148,7 @@ public class Heap {
                 numMarkedNodes = Math.max(0, numMarkedNodes - 1);
             }
             x.node.marked = false;
-        }
+        }*/
     }
 
     public void nonLazyDecreaseKey(HeapItem x) {
@@ -391,6 +414,9 @@ public class Heap {
             this.size--;
             this.min = minNext.item; // Temporarily set min to next node
             updateMin();
+            if (!this.lazyMelds) {
+                consolidate();
+            }
             return;
         }
     }
@@ -407,7 +433,8 @@ public class Heap {
 
         if (this.lazyDecreaseKeys) {
             lazyDecreaseKey(x);
-        } else {
+        }
+        else {
             nonLazyDecreaseKey(x);
         }
         if (x.key < this.min.key) { this.min = x; }
